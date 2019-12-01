@@ -1,0 +1,19 @@
+{
+  "name": "churn",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MediBoss/Churn.git"
+  },
+  "author": "Medi Assumani",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MediBoss/Churn/issues"
+  },
+  "homepage": "https://github.com/MediBoss/Churn#readme"
+}
