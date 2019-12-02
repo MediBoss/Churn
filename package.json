@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/MediBoss/Churn/issues"
   },
-  "homepage": "https://github.com/MediBoss/Churn#readme"
+  "homepage": "https://github.com/MediBoss/Churn#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
