@@ -1,7 +1,7 @@
 
 // Import required libraries
 import express from 'express';
-import { ApolloServer } from 'apollo-server-express';
+import { ApolloServer, gql } from 'apollo-server-express';
 
 // Cors is needed to make HTTP requests to other domains
 import cors from 'cors';
@@ -15,37 +15,81 @@ app.use(cors());
 // NOTE: "type" here is like "class" in Swift.
 const schema = gql `
   type Query {
-    me: User
-    user(id: ID!): User
+    current_company: Company
+    company(id: ID!): Company
   }
 
-  type User {
+  type Company {
     id: ID!
-    username: String!
+    name: String!
+    ceo: String!
+    location: String!
+    employee_count: Int!
+    is_hiring: Boolean
   }
 `;
 
-let users = {
+let companies = {
   1: {
     id: '1',
-    username: 'Medi Boss', },
+    name: 'Facebook Inc', 
+    ceo: 'Mark Zuckeberg',
+    location: 'Palo Alto, CA',
+    employee_count: 12000,
+    is_hiring: true  
+  },
+
   2: {
     id: '2',
-    username: 'Dave Davids', },
+    name: 'Apple Inc', 
+    ceo: 'Tim Cook',
+    location: 'Cupertino, CA',
+    employee_count: 3000,
+    is_hiring: false  
+  },
+
+
+  3: {
+    id: '3',
+    name: 'Betterment Inc', 
+    ceo: 'Jon Stein',
+    location: 'New York City, NY',
+    employee_count: 500,
+    is_hiring: true  
+  },
+
+  4: {
+    id: '4',
+    name: 'Stride Health Inc', 
+    ceo: 'Noah Lang',
+    location: 'San Francisco, CA',
+    employee_count: 40,
+    is_hiring: true  
+  },
+
+  5: {
+    id: '5',
+    name: 'Square Inc', 
+    ceo: 'Jack Dorsey',
+    location: 'San Francisco, CA',
+    employee_count: 900,
+    is_hiring: false
+  },
 };
 
-const me = users[1];
+const current = companies[4];
 
 // NOTE: The resolver takes care of returning data for fields from the schema.
+
 const resolvers = {
   Query: {
-    user: (parent, { id }) => {
-      return users[id];
+    company: (parent, { id }) => {
+      return companies[id];
     },
 
-    me: () => {
-      return me;
-    },
+    current_company: () => {
+      return current;
+    }
   }
 }
 
