@@ -17,7 +17,11 @@ const schema = gql `
   type Query {
     current_company: Company
     company(id: ID!): Company
-  }
+    companies: [Company!]
+
+    Funding: Funding
+    fundings: [Funding!]
+  },
 
   type Company {
     id: ID!
@@ -26,6 +30,14 @@ const schema = gql `
     location: String!
     employee_count: Int!
     is_hiring: Boolean
+    fundings: [Funding]
+  }
+
+  type Funding {
+    id: ID!
+    round: String!
+    amount: Int!
+    company: Company!
   }
 `;
 
@@ -36,7 +48,8 @@ let companies = {
     ceo: 'Mark Zuckeberg',
     location: 'Palo Alto, CA',
     employee_count: 12000,
-    is_hiring: true  
+    is_hiring: true,
+    fundings  
   },
 
   2: {
@@ -77,18 +90,49 @@ let companies = {
   },
 };
 
+let fundings =  {
+
+  1: {
+    round: 'D',
+    amount: 57000000
+  },
+
+  2: {
+    round: 'A',
+    amount: 2000000
+  },
+}
+
 const current = companies[4];
 
 // NOTE: The resolver takes care of returning data for fields from the schema.
-
 const resolvers = {
   Query: {
+
+    // Fetch a single company
     company: (parent, { id }) => {
       return companies[id];
     },
 
+    // Fetch the currently employed in company
     current_company: () => {
       return current;
+    },
+
+    // Fetch all the companies in the database
+    companies: () => {
+      return Object.values(companies);
+    },
+
+    // Fetch all the available company fundings
+    fundings: () => {
+      return Object.values(fundings);
+    },
+
+    Funding: () => {
+      company: (parent, args, {current} ) => {
+        return current;
+      }
     }
   }
 }
@@ -101,6 +145,6 @@ const server = new ApolloServer({
 // Using applyMiddleware to to set our express app as our middleware
 server.applyMiddleware({ app, path: '/graphql' });
 
-app.listen({ port: 8000 }, () => {
-  console.log('Apollo Server on http://localhost:8000/graphql');
+app.listen({ port: 3000 }, () => {
+  console.log('Apollo Server on http://localhost:3000/graphql');
 });
