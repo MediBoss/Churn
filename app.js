@@ -19,8 +19,8 @@ const schema = gql `
     company(id: ID!): Company
     companies: [Company!]
 
-    Funding: Funding
-    fundings: [Funding!]
+    funding(id: ID!): Funding!
+    fundings: [Funding!]!
   },
 
   type Company {
@@ -37,7 +37,7 @@ const schema = gql `
     id: ID!
     round: String!
     amount: Int!
-    company: Company!
+    company: Company
   }
 `;
 
@@ -49,7 +49,7 @@ let companies = {
     location: 'Palo Alto, CA',
     employee_count: 12000,
     is_hiring: true,
-    fundings  
+    funding_ids: [356267]
   },
 
   2: {
@@ -58,7 +58,8 @@ let companies = {
     ceo: 'Tim Cook',
     location: 'Cupertino, CA',
     employee_count: 3000,
-    is_hiring: false  
+    is_hiring: false,
+    funding_ids: [836267]   
   },
 
 
@@ -68,42 +69,36 @@ let companies = {
     ceo: 'Jon Stein',
     location: 'New York City, NY',
     employee_count: 500,
-    is_hiring: true  
-  },
-
-  4: {
-    id: '4',
-    name: 'Stride Health Inc', 
-    ceo: 'Noah Lang',
-    location: 'San Francisco, CA',
-    employee_count: 40,
-    is_hiring: true  
-  },
-
-  5: {
-    id: '5',
-    name: 'Square Inc', 
-    ceo: 'Jack Dorsey',
-    location: 'San Francisco, CA',
-    employee_count: 900,
-    is_hiring: false
-  },
+    is_hiring: true,
+    funding_ids: [127673]   
+  }
 };
 
 let fundings =  {
 
   1: {
+    id: '127673',
     round: 'D',
-    amount: 57000000
+    amount: 57000000,
+    company_id: '3'
   },
 
   2: {
+    id: '836267',
     round: 'A',
-    amount: 2000000
+    amount: 2000000,
+    company_id: '2'
   },
+
+  3: {
+    id: '356267',
+    round: 'D',
+    amount: 40000000,
+    company_id: '1'
+  }
 }
 
-const current = companies[4];
+const current_company = companies[1];
 
 // NOTE: The resolver takes care of returning data for fields from the schema.
 const resolvers = {
@@ -129,10 +124,22 @@ const resolvers = {
       return Object.values(fundings);
     },
 
-    Funding: () => {
-      company: (parent, args, {current} ) => {
-        return current;
-      }
+    funding: (parent, { id }) => {
+      return fundings[id];
+    },
+  },
+
+  Company: {
+    fundings: company => {
+      return Object.values(fundings).filter(
+        funding => funding.company_id = company.id
+      )
+    }
+  },
+
+  Funding: {
+    company: funding => {
+      return companies[funding.company_id]
     }
   }
 }
@@ -140,6 +147,9 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs: schema,
   resolvers,
+  context: {
+    current_company: companies[1],
+  },
 });
 
 // Using applyMiddleware to to set our express app as our middleware
